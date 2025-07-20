@@ -1,10 +1,11 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
 import { CreateUserSchema,SinginSchema } from '@repo/common/types';
-import {prismaClient} from '@repo/db/client';
 import {JWT_SECRET} from "@repo/backend-common/config"
 import bcrypt from "bcrypt"
 import Jwt from "jsonwebtoken"
+import {prismaClient} from "@repo/db/client"
+
 
 const app = express();
 
@@ -31,11 +32,11 @@ app.post('/signup',async(req:Request, res:Response) => {
     try{
         const hashedPassword = bcrypt.hash(parsedData.data.password,5)
 
-        const user = await prismaClient.user.create({
-            data:{
-                email : parsedData.data.email,
-                username : parsedData.data.username,
-                password : hashedPassword,
+         const user = await prismaClient.user.create({
+            data: {
+                email: parsedData.data?.username,
+                password: hashedPassword,
+                name: parsedData.data.username
             }
         })
 
@@ -56,38 +57,23 @@ app.post('/signup',async(req:Request, res:Response) => {
 app.post('/signin',(req:Request, res:Response) => {
     const parsedData = SinginSchema.safeParse(req.body);
 
-    if(!parsedData.success){
-        res.json({
-            message :"Invalid input"
-        })
-        return
-    }
-
     try{
 
-        const user = prismaClient.user.findFirst({
-            where :{
-                email : parsedData.data.email,
-                password : parsedData.data.password
-            }
-        })
-
-        if(!user){
+        if(!parsedData.success){
             res.json({
-                message : "user not signed up"
+                message :"Invalid input"
             })
-            return;
+            return
         }
-
-        const token = Jwt.sign({
-            userId : user?.id
-        }, JWT_SECRET || "")
-
-        res.json({
-            message : "user signed in",
-            token : token
-        })
+    
+         
+    
+            res.json({
+                message : "user signed in",
+                // token : token
+            })
     }
+    
     catch(e){
 
         res.status(500).json({
