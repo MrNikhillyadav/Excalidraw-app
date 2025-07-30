@@ -129,6 +129,12 @@ importers:
 
   packages/common:
     dependencies:
+      '@types/jsonwebtoken':
+        specifier: ^9.0.10
+        version: 9.0.10
+      jsonwebtoken:
+        specifier: ^9.0.2
+        version: 9.0.2
       zod:
         specifier: ^4.0.5
         version: 4.0.5
